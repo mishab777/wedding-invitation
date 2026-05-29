@@ -28,14 +28,18 @@ const AudioController = forwardRef(function AudioController(
     if (!audio) return;
     cancelFade();
     const start = performance.now();
-    const from = audio.volume;
+    const from = Math.min(1, Math.max(0, Number.isFinite(audio.volume) ? audio.volume : 0));
+    const clamp = (v) => Math.min(1, Math.max(0, v));
     const step = (now) => {
       const t = Math.min(1, (now - start) / duration);
       const eased = t * (2 - t);
-      audio.volume = from + (target - from) * eased;
+      const newVol = from + (target - from) * eased;
+      audio.volume = clamp(newVol);
       if (t < 1) {
         fadeFrame.current = requestAnimationFrame(step);
       } else {
+        // ensure exact final value within bounds
+        audio.volume = clamp(target);
         fadeFrame.current = null;
         onDone?.();
       }
