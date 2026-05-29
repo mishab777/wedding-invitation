@@ -161,6 +161,7 @@ export default function Hero() {
               arabicName="عائشة"
               role="The Bride"
               side="left"
+              image="/images/bride.jpg"
             />
           </Grid>
           <Grid item xs={12} sm={6} md={5}>
@@ -169,6 +170,7 @@ export default function Hero() {
               arabicName="أحمد"
               role="The Groom"
               side="right"
+              image="/images/groom.jpg"
             />
           </Grid>
         </Grid>

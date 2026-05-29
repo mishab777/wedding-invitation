@@ -4,12 +4,12 @@ import { palette } from '@/theme/theme';
 import { Divider } from './Ornaments';
 
 const tiles = [
-  { gradient: `linear-gradient(135deg, ${palette.warmGray} 0%, ${palette.softBrown} 100%)`, label: 'Moments' },
-  { gradient: `linear-gradient(160deg, ${palette.beige} 0%, ${palette.rose} 80%)`, label: 'Quiet days' },
-  { gradient: `linear-gradient(135deg, ${palette.softBrown} 0%, ${palette.deepBrown} 100%)`, label: 'Promises' },
-  { gradient: `linear-gradient(160deg, ${palette.ivory} 0%, ${palette.beige} 100%)`, label: 'Together' },
-  { gradient: `linear-gradient(135deg, ${palette.warmGray} 0%, ${palette.rose} 100%)`, label: 'Family' },
-  { gradient: `linear-gradient(135deg, ${palette.deepBrown} 0%, ${palette.softBrown} 80%)`, label: 'Du’a' }
+  { gradient: `linear-gradient(135deg, ${palette.warmGray} 0%, ${palette.softBrown} 100%)`, label: 'Moments', image: '/images/album-1.jpg' },
+  { gradient: `linear-gradient(160deg, ${palette.beige} 0%, ${palette.rose} 80%)`, label: 'Quiet days', image: '/images/album-2.jpg' },
+  { gradient: `linear-gradient(135deg, ${palette.softBrown} 0%, ${palette.deepBrown} 100%)`, label: 'Promises', image: '/images/album-3.jpg' },
+  { gradient: `linear-gradient(160deg, ${palette.ivory} 0%, ${palette.beige} 100%)`, label: 'Together', image: '/images/album-4.jpg' },
+  { gradient: `linear-gradient(135deg, ${palette.warmGray} 0%, ${palette.rose} 100%)`, label: 'Family', image: '/images/album-5.jpg' },
+  { gradient: `linear-gradient(135deg, ${palette.deepBrown} 0%, ${palette.softBrown} 80%)`, label: 'Du’a', image: '/images/album-6.jpg' }
 ];
 
 function Tile({ tile, span = 4, height = 320, delay = 0 }) {
@@ -38,7 +38,10 @@ function Tile({ tile, span = 4, height = 320, delay = 0 }) {
           sx={{
             position: 'absolute',
             inset: 0,
-            background: tile.gradient,
+            backgroundImage: tile.image ? `url(${tile.image}), ${tile.gradient}` : tile.gradient,
+            backgroundSize: 'cover, 100% 100%',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
             transition: 'transform 1.4s ease',
             filter: 'saturate(0.85)'
           }}
