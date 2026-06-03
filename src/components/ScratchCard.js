@@ -157,8 +157,7 @@ export default function ScratchCard({
         width,
         height,
         mx: 'auto',
-        userSelect: 'none',
-        touchAction: 'none'
+        userSelect: 'none'
       }}
     >
       {/* Hidden underlay revealed by scratch */}
@@ -183,6 +182,7 @@ export default function ScratchCard({
               position: 'absolute',
               inset: 0,
               cursor: 'grab',
+              touchAction: 'none',
               '&:active': { cursor: 'grabbing' }
             }}
           >
@@ -195,7 +195,7 @@ export default function ScratchCard({
               onTouchStart={handleStart}
               onTouchMove={handleMove}
               onTouchEnd={handleEnd}
-              style={{ display: 'block', borderRadius: 2 }}
+              style={{ display: 'block', borderRadius: 2, touchAction: 'none' }}
             />
             {!hasStarted && (
               <Box
