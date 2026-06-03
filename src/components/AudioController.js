@@ -1,7 +1,4 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { Box, Typography } from '@mui/material';
-import { AnimatePresence, motion } from 'framer-motion';
-import { palette } from '@/theme/theme';
 
 const TARGET_VOLUME = 0.45;
 const FADE_DURATION_MS = 2600;
@@ -14,7 +11,6 @@ const AudioController = forwardRef(function AudioController(
   const fadeFrame = useRef(null);
   const gestureUnlock = useRef(null);
   const [playing, setPlaying] = useState(false);
-  const [hint, setHint] = useState(null);
 
   const cancelFade = () => {
     if (fadeFrame.current) {
@@ -94,21 +90,12 @@ const AudioController = forwardRef(function AudioController(
     setPlaying(true);
     onStateChange?.(true);
     fadeTo(TARGET_VOLUME, FADE_DURATION_MS);
-    setHint({
-      title: 'A soft nasheed plays',
-      body: 'Adjust or mute anytime in the top right.'
-    });
-    setTimeout(() => setHint(null), 5200);
     return true;
   };
 
   const play = async () => {
     const ok = await startPlayback();
     if (!ok) {
-      setHint({
-        title: 'Tap anywhere to begin',
-        body: 'Your browser paused the nasheed until you interact.'
-      });
       armGestureUnlock();
     }
   };
@@ -128,55 +115,13 @@ const AudioController = forwardRef(function AudioController(
   useImperativeHandle(ref, () => ({ play, pause, toggle, isPlaying: () => playing }), [playing]);
 
   useEffect(() => {
-    armGestureUnlock();
     return () => {
       cancelFade();
       disarmGestureUnlock();
     };
   }, []);
 
-  return (
-    <>
-      <audio ref={audioRef} src={src} preload="auto" loop />
-      <AnimatePresence>
-        {hint && (
-          <Box
-            component={motion.div}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 24 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-            sx={{
-              position: 'fixed',
-              bottom: { xs: 20, md: 32 },
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: 1400,
-              px: 3,
-              py: 2,
-              background: `${palette.deepBrown}f0`,
-              color: palette.offWhite,
-              border: `1px solid ${palette.gold}55`,
-              backdropFilter: 'blur(8px)',
-              minWidth: 280,
-              textAlign: 'center'
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ fontSize: 10, letterSpacing: '0.4em', color: palette.gold, mb: 0.5 }}
-            >
-              ✦  Nasheed  ✦
-            </Typography>
-            <Typography sx={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: 'italic', fontSize: 18 }}>
-              {hint.title}
-            </Typography>
-            <Typography sx={{ fontSize: 12, mt: 0.5, opacity: 0.75 }}>{hint.body}</Typography>
-          </Box>
-        )}
-      </AnimatePresence>
-    </>
-  );
+  return <audio ref={audioRef} src={src} preload="auto" loop />;
 });
 
 export default AudioController;

@@ -3,10 +3,12 @@ import { Box, Typography } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import { palette } from '@/theme/theme';
 import { WEDDING } from '@/config/wedding';
+import Confetti from './Confetti';
 
 export default function Loader({ revealDelay = 1800, onOpen }) {
   const [visible, setVisible] = useState(true);
   const [ready, setReady] = useState(false);
+  const [bursting, setBursting] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), revealDelay);
@@ -16,9 +18,11 @@ export default function Loader({ revealDelay = 1800, onOpen }) {
   // The click here is a real user gesture, so onOpen can reliably start audio
   // in every browser (including desktop Chrome) — no autoplay block.
   const handleOpen = () => {
-    if (!visible) return;
-    setVisible(false);
+    if (!visible || bursting) return;
+    setBursting(true);
     onOpen?.();
+    // Let the popper play, then fade the cover away.
+    setTimeout(() => setVisible(false), 1100);
   };
 
   return (
@@ -37,7 +41,8 @@ export default function Loader({ revealDelay = 1800, onOpen }) {
             background: `radial-gradient(circle at center, ${palette.ivory} 0%, ${palette.offWhite} 60%, ${palette.beige} 130%)`
           }}
         >
-          <Box sx={{ textAlign: 'center', px: 3 }}>
+          <Box sx={{ textAlign: 'center', px: 3, position: 'relative' }}>
+            <Confetti active={bursting} count={90} spread={620} />
             <Box
               component={motion.div}
               initial={{ scale: 0.85, opacity: 0 }}
@@ -112,10 +117,14 @@ export default function Loader({ revealDelay = 1800, onOpen }) {
                   type="button"
                   onClick={handleOpen}
                   initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  animate={
+                    bursting
+                      ? { opacity: 0, scale: 1.15, transition: { duration: 0.6, ease: 'easeOut' } }
+                      : { opacity: 1, y: 0 }
+                  }
                   transition={{ duration: 0.8, ease: 'easeOut' }}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={!bursting ? { scale: 1.04 } : undefined}
+                  whileTap={!bursting ? { scale: 0.97 } : undefined}
                   sx={{
                     display: 'inline-block',
                     mt: 4,

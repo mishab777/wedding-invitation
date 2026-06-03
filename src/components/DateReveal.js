@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { Box, Container, Typography } from '@mui/material';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Box, Container, Typography, useMediaQuery } from '@mui/material';
 import { motion, useInView } from 'framer-motion';
 import { palette } from '@/theme/theme';
 import { WEDDING } from '@/config/wedding';
 import { CornerOrnament, Divider, GeometricGrid } from './Ornaments';
+import ScratchCard from './ScratchCard';
+import Confetti from './Confetti';
 
 const letterContainer = {
   hidden: { opacity: 0 },
@@ -11,7 +13,7 @@ const letterContainer = {
     opacity: 1,
     transition: {
       staggerChildren: 0.06,
-      delayChildren: 0.2
+      delayChildren: 0.1
     }
   }
 };
@@ -47,17 +49,124 @@ function AnimatedText({ text, sx }) {
   );
 }
 
+function DateContent() {
+  return (
+    <Box
+      component={motion.div}
+      variants={letterContainer}
+      initial="hidden"
+      animate="show"
+      sx={{ width: '100%', textAlign: 'center', px: 2 }}
+    >
+      <AnimatedText
+        text={WEDDING.dayMonthYear.month.toUpperCase()}
+        sx={{
+          fontFamily: '"Inter", sans-serif',
+          letterSpacing: '0.5em',
+          fontSize: { xs: 12, md: 16 },
+          color: palette.warmGray
+        }}
+      />
+
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'baseline',
+          gap: { xs: 1.5, md: 4 },
+          my: { xs: 1.5, md: 2.5 }
+        }}
+      >
+        <Box component={motion.div} variants={letter} sx={{ textAlign: 'right' }}>
+          <Typography
+            sx={{
+              fontFamily: '"Cormorant Garamond", serif',
+              fontSize: { xs: 44, md: 90 },
+              color: palette.warmGray,
+              letterSpacing: '0.04em',
+              fontWeight: 300,
+              lineHeight: 1
+            }}
+          >
+            SAT
+          </Typography>
+        </Box>
+
+        <Box
+          component={motion.div}
+          variants={letter}
+          sx={{
+            position: 'relative',
+            px: { xs: 1.5, md: 3 },
+            borderLeft: `1px solid ${palette.gold}66`,
+            borderRight: `1px solid ${palette.gold}66`
+          }}
+        >
+          <Typography
+            sx={{
+              fontFamily: '"Cormorant Garamond", serif',
+              fontSize: { xs: 90, md: 180 },
+              color: palette.softBrown,
+              fontWeight: 400,
+              lineHeight: 1,
+              fontStyle: 'italic'
+            }}
+          >
+            {WEDDING.dayMonthYear.day}
+          </Typography>
+        </Box>
+
+        <Box component={motion.div} variants={letter} sx={{ textAlign: 'left' }}>
+          <Typography
+            sx={{
+              fontFamily: '"Cormorant Garamond", serif',
+              fontSize: { xs: 44, md: 90 },
+              color: palette.warmGray,
+              letterSpacing: '0.04em',
+              fontWeight: 300,
+              lineHeight: 1
+            }}
+          >
+            {WEDDING.dayMonthYear.year.slice(2)}
+          </Typography>
+        </Box>
+      </Box>
+
+      <AnimatedText
+        text={WEDDING.time.toUpperCase()}
+        sx={{
+          fontFamily: '"Inter", sans-serif',
+          letterSpacing: '0.5em',
+          fontSize: { xs: 11, md: 13 },
+          color: palette.warmGray
+        }}
+      />
+    </Box>
+  );
+}
+
 export default function DateReveal({ onReveal }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-25% 0px -25% 0px' });
+  const isInView = useInView(ref, { once: true, margin: '-20% 0px -20% 0px' });
   const [revealed, setRevealed] = useState(false);
+  const [burst, setBurst] = useState(false);
+
+  const isSmall = useMediaQuery('(max-width:600px)');
+  const cardWidth = isSmall ? 320 : 560;
+  const cardHeight = isSmall ? 230 : 320;
+
+  const handleComplete = useCallback(() => {
+    if (revealed) return;
+    setRevealed(true);
+    setBurst(true);
+    onReveal?.();
+  }, [revealed, onReveal]);
 
   useEffect(() => {
-    if (isInView && !revealed) {
-      setRevealed(true);
-      onReveal?.();
-    }
-  }, [isInView, revealed, onReveal]);
+    if (!burst) return;
+    const t = setTimeout(() => setBurst(false), 2400);
+    return () => clearTimeout(t);
+  }, [burst]);
 
   return (
     <Box
@@ -87,103 +196,24 @@ export default function DateReveal({ onReveal }) {
         </Box>
 
         <Box
-          component={motion.div}
-          variants={letterContainer}
-          initial="hidden"
-          animate={revealed ? 'show' : 'hidden'}
-          sx={{ my: 4 }}
+          sx={{
+            position: 'relative',
+            my: { xs: 3, md: 5 },
+            display: 'grid',
+            placeItems: 'center'
+          }}
         >
-          <AnimatedText
-            text={WEDDING.dayMonthYear.month.toUpperCase()}
-            sx={{
-              fontFamily: '"Inter", sans-serif',
-              letterSpacing: '0.5em',
-              fontSize: { xs: 14, md: 18 },
-              color: palette.warmGray
-            }}
-          />
-
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'baseline',
-              gap: { xs: 2, md: 5 },
-              my: { xs: 2, md: 3 }
-            }}
-          >
-            <Box
-              component={motion.div}
-              variants={letter}
-              sx={{ textAlign: 'right' }}
+          {isInView && (
+            <ScratchCard
+              width={cardWidth}
+              height={cardHeight}
+              onComplete={handleComplete}
+              hint="Scratch to reveal"
             >
-              <Typography
-                sx={{
-                  fontFamily: '"Cormorant Garamond", serif',
-                  fontSize: { xs: 60, md: 110 },
-                  color: palette.warmGray,
-                  letterSpacing: '0.04em',
-                  fontWeight: 300,
-                  lineHeight: 1
-                }}
-              >
-                SAT
-              </Typography>
-            </Box>
-
-            <Box
-              component={motion.div}
-              variants={letter}
-              sx={{
-                position: 'relative',
-                px: { xs: 2, md: 4 },
-                borderLeft: `1px solid ${palette.gold}66`,
-                borderRight: `1px solid ${palette.gold}66`
-              }}
-            >
-              <Typography
-                sx={{
-                  fontFamily: '"Cormorant Garamond", serif',
-                  fontSize: { xs: 120, md: 220 },
-                  color: palette.softBrown,
-                  fontWeight: 400,
-                  lineHeight: 1,
-                  fontStyle: 'italic'
-                }}
-              >
-                {WEDDING.dayMonthYear.day}
-              </Typography>
-            </Box>
-
-            <Box
-              component={motion.div}
-              variants={letter}
-              sx={{ textAlign: 'left' }}
-            >
-              <Typography
-                sx={{
-                  fontFamily: '"Cormorant Garamond", serif',
-                  fontSize: { xs: 60, md: 110 },
-                  color: palette.warmGray,
-                  letterSpacing: '0.04em',
-                  fontWeight: 300,
-                  lineHeight: 1
-                }}
-              >
-                {WEDDING.dayMonthYear.year.slice(2)}
-              </Typography>
-            </Box>
-          </Box>
-
-          <AnimatedText
-            text={WEDDING.time.toUpperCase()}
-            sx={{
-              fontFamily: '"Inter", sans-serif',
-              letterSpacing: '0.5em',
-              fontSize: { xs: 12, md: 14 },
-              color: palette.warmGray
-            }}
-          />
+              <DateContent />
+            </ScratchCard>
+          )}
+          <Confetti active={burst} count={70} spread={520} />
         </Box>
 
         <Divider />
@@ -191,7 +221,7 @@ export default function DateReveal({ onReveal }) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-          transition={{ delay: 1.4, duration: 1 }}
+          transition={{ delay: 0.4, duration: 1 }}
         >
           <Typography
             className="arabic"
