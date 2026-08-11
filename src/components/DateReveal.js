@@ -145,7 +145,12 @@ function DateContent() {
   );
 }
 
-export default function DateReveal({ onReveal }) {
+export default function DateReveal({
+  onReveal,
+  autoReveal = false,
+  autoRevealDelay = 900,
+  confetti = true
+}) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-20% 0px -20% 0px' });
   const [revealed, setRevealed] = useState(false);
@@ -209,11 +214,13 @@ export default function DateReveal({ onReveal }) {
               height={cardHeight}
               onComplete={handleComplete}
               hint="Scratch to reveal"
+              autoReveal={autoReveal}
+              autoRevealDelay={autoRevealDelay}
             >
               <DateContent />
             </ScratchCard>
           )}
-          <Confetti active={burst} count={70} spread={520} />
+          <Confetti active={confetti && burst} count={70} spread={520} />
         </Box>
 
         <Divider />

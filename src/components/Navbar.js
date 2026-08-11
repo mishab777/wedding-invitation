@@ -13,7 +13,7 @@ const links = [
   { id: 'rsvp', label: 'RSVP' }
 ];
 
-export default function Navbar({ audioOn, onToggleAudio }) {
+export default function Navbar({ audioOn, onToggleAudio, showAudio = true }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -79,20 +79,25 @@ export default function Navbar({ audioOn, onToggleAudio }) {
             ))}
           </Box>
 
-          <IconButton
-            onClick={onToggleAudio}
-            sx={{
-              border: `1px solid ${palette.warmGray}77`,
-              borderRadius: '50%',
-              width: 38,
-              height: 38,
-              color: palette.softBrown,
-              '&:hover': { borderColor: palette.gold, color: palette.gold }
-            }}
-            aria-label={audioOn ? 'Mute background nasheed' : 'Play background nasheed'}
-          >
-            {audioOn ? <VolumeUpIcon fontSize="small" /> : <VolumeOffIcon fontSize="small" />}
-          </IconButton>
+          {showAudio ? (
+            <IconButton
+              onClick={onToggleAudio}
+              sx={{
+                border: `1px solid ${palette.warmGray}77`,
+                borderRadius: '50%',
+                width: 38,
+                height: 38,
+                color: palette.softBrown,
+                '&:hover': { borderColor: palette.gold, color: palette.gold }
+              }}
+              aria-label={audioOn ? 'Mute background nasheed' : 'Play background nasheed'}
+            >
+              {audioOn ? <VolumeUpIcon fontSize="small" /> : <VolumeOffIcon fontSize="small" />}
+            </IconButton>
+          ) : (
+            // Keeps the space-between toolbar balanced when the control is hidden.
+            <Box sx={{ width: 38, height: 38 }} />
+          )}
         </Toolbar>
       </Container>
     </AppBar>

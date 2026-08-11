@@ -50,7 +50,11 @@ export default function ScratchCard({
   height,
   onComplete,
   children,
-  hint = '✦ Scratch to reveal ✦'
+  hint = '✦ Scratch to reveal ✦',
+  // Reveals without a scratch gesture. Used by the /sample capture route, where
+  // no pointer is available to scratch the cover away.
+  autoReveal = false,
+  autoRevealDelay = 700
 }) {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -86,6 +90,12 @@ export default function ScratchCard({
       finish();
     }
   }, [finish]);
+
+  useEffect(() => {
+    if (!autoReveal) return undefined;
+    const t = setTimeout(finish, autoRevealDelay);
+    return () => clearTimeout(t);
+  }, [autoReveal, autoRevealDelay, finish]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -197,7 +207,7 @@ export default function ScratchCard({
               onTouchEnd={handleEnd}
               style={{ display: 'block', borderRadius: 2, touchAction: 'none' }}
             />
-            {!hasStarted && (
+            {!hasStarted && !autoReveal && (
               <Box
                 component={motion.div}
                 initial={{ opacity: 0 }}
